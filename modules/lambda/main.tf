@@ -1,49 +1,81 @@
-resource "aws_lambda_function" "my_lambda" {
-  function_name = "my_lambda_function"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.8"
-  role          = aws_iam_role.lambda_exec_role.arn
-  filename      = "lambda_function.zip"
+# modules/lambda/main.tf
+
+resource "aws_lambda_function" "add_sample_data" {
+  function_name = "m1-add-sample-data"
+  runtime       = "python3.10"
+  role          = var.lambda_execution_role_arn
+  handler       = "add_user.lambda_handler"
+
+  filename      = var.add_user_zip_file
 
   environment {
     variables = {
-      TABLE_NAME = var.table_name
+      TABLE_NAME = var.dynamodb_table_name
     }
   }
 }
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_exec_role"
+resource "aws_lambda_function" "get_users" {
+  function_name = "get-users"
+  runtime       = "python3.10"
+  role          = var.lambda_execution_role_arn
+  handler       = "get_user.lambda_handler"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
-      Principal = {
-        Service = "lambda.amazonaws.com",
-      },
-    }],
-  })
+  filename      = var.get_user_zip_file
 
-  inline_policy {
-    name   = "lambda_policy"
-    policy = jsonencode({
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Action = [
-            "dynamodb:PutItem",
-            "dynamodb:BatchWriteItem",
-          ],
-          Effect   = "Allow",
-          Resource = "*",
-        },
-      ],
-    })
+  environment {
+    variables = {
+      TABLE_NAME = var.dynamodb_table_name
+    }
   }
 }
 
-output "lambda_arn" {
-  value = aws_lambda_function.my_lambda.arn
+output "add_sample_data_lambda_arn" {
+  value = aws_lambda_function.add_sample_data.arn
+}
+
+output "get_users_lambda_arn" {
+  value = aws_lambda_function.get_users.arn
+}
+
+resource "aws_iam_role" "lambda_execution_role" {
+  name = var.role_name
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Effect    = "Allow"
+        Sid       = ""
+      }
+    ]
+  })
+}
+
+# Attach DynamoDB Full Access policy
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_full_access" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+# Attach DynamoDB Read-Only Access policy
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_readonly_access" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+# Attach Lambda Basic Execution policy for CloudWatch Logs
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
+
+
+output "lambda_execution_role_arn" {
+  value = aws_iam_role.lambda_execution_role.arn
 }
