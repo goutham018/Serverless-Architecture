@@ -1,5 +1,5 @@
 variable "region" {
-  description = "aws region name"
+  description = "aws region"
   type        = string
 }
 

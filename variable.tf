@@ -19,7 +19,7 @@ variable "get_user_zip_file" {
 variable "dynamodb_table_name" {
   description = "Name of the DynamoDB table"
   type        = string
-  default     = "serverless_workshop_intro"
+  default     = "dynamodb-db"
 }
 
 variable "dynamodb_hash_key" {

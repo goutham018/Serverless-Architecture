@@ -1,5 +1,3 @@
-# modules/lambda/variables.tf
-
 variable "lambda_execution_role_arn" {
   description = "The ARN of the IAM role for Lambda execution"
   type        = string
@@ -21,7 +19,6 @@ variable "dynamodb_table_name" {
   type        = string
 }
 
-# modules/iam/variables.tf
 
 variable "role_name" {
   description = "The name of the IAM role for Lambda"

@@ -1,7 +1,7 @@
 # modules/lambda/main.tf
 
 resource "aws_lambda_function" "add_sample_data" {
-  function_name = "m1-add-sample-data"
+  function_name = "post-data"
   runtime       = "python3.10"
   role          = var.lambda_execution_role_arn
   handler       = "add_user.lambda_handler"

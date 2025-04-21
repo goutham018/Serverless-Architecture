@@ -1,19 +1,14 @@
-# modules/api_gateway/main.tf
-
-# Create the API Gateway Rest API
 resource "aws_api_gateway_rest_api" "serverless_rest_api" {
   name        = var.api_name
   description = var.api_description
 }
 
-# Create the 'users' resource under the root path
 resource "aws_api_gateway_resource" "users_resource" {
   rest_api_id = aws_api_gateway_rest_api.serverless_rest_api.id
   parent_id   = aws_api_gateway_rest_api.serverless_rest_api.root_resource_id
   path_part   = "users"
 }
 
-# Define the 'GET' method for the /users resource
 resource "aws_api_gateway_method" "get_users_method" {
   rest_api_id   = aws_api_gateway_rest_api.serverless_rest_api.id
   resource_id   = aws_api_gateway_resource.users_resource.id
