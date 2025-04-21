@@ -1,0 +1,13 @@
+checkov:
+  skip_checks:
+    - CKV_AWS_20  # Example: Skip specific checks
+  quiet: true  # Suppress output
+  soft_fail: true  # Do not fail the build on issues
+  output_format: json  # Output format (json, cli, junitxml, etc.)
+  framework:
+    - terraform  # Specify frameworks to scan (terraform, cloudformation, etc.)
+  download_external_modules: true  # Download external modules for scanning
+  external_modules_download_path: .external_modules  # Path to download external modules
+  use_enforcement_rules: true  # Use enforcement rules
+  enforcement_rules:
+    - CKV_AWS_20  # Example: Enforce specific rules
